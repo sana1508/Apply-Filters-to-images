@@ -1,63 +1,162 @@
-var fgImage = null;
-var bgImage = null;
-var fgCanvas;
-var bgCanvas;
-
-function loadForegroundImage() {
+var image = null;
+var grayImage = null;
+var redImage = null;
+var rbimage=null;
+var Canvas;
+function loadImage() {
   var file = document.getElementById("fgfile");
-  fgImage = new SimpleImage(file);
-  fgCanvas = document.getElementById("fgcan");
-  fgImage.drawTo(fgCanvas);
+  image = new SimpleImage(file);
+  grayImage = new SimpleImage(file);
+  redImage = new SimpleImage(file);
+  rbimage = new SimpleImage(file);
+  Canvas = document.getElementById("can");
+  image.drawTo(Canvas);
 }
-
-function loadBackgroundImage() {
-  var file = document.getElementById("bgfile");
-  bgImage = new SimpleImage(file);
-  bgCanvas = document.getElementById("bgcan");
-  bgImage.drawTo(bgCanvas);
+function doGray(){
+  if(image==null||!image.complete()){
+    alert("Image is not Loaded Yet");
+    return
+  }
+  for (var pixel of grayImage.values()) {
+    var avg = (pixel.getRed()+pixel.getGreen()+pixel.getBlue())/3;
+    pixel.setRed(avg);
+    pixel.setGreen(avg);
+    pixel.setBlue(avg);
+  }
+  Canvas = document.getElementById("can");
+  grayImage.drawTo(Canvas);
 }
-
-function createComposite() {
-  // this function creates a new image with the dimensions of the foreground image and returns the composite green screen image
-  var output = new SimpleImage(fgImage.getWidth(),fgImage.getHeight());
-  var greenThreshold = 240;
-  for (var pixel of fgImage.values()) {
-    var x = pixel.getX();
-    var y = pixel.getY();
-    if (pixel.getGreen() > greenThreshold) {
-      //pixel is green, use background
-      var bgPixel = bgImage.getPixel(x,y);
-      output.setPixel(x,y,bgPixel);
+function doRed(){
+  if(image==null||!image.complete()){
+    alert("Image is not Loaded Yet");
+    return;
+  }
+  for (var pixel of redImage.values()) {
+    var avg = (pixel.getRed()+pixel.getGreen()+pixel.getBlue())/3;
+    if(avg<128){
+      pixel.setRed(2*avg);
+      pixel.setGreen(0);
+      pixel.setBlue(0);
     }
-    else {
-      //pixel is not green, use foreground
-      output.setPixel(x,y,pixel);
+    else{
+      pixel.setRed(255);
+      pixel.setGreen((2*avg)-255);
+      pixel.setBlue((2*avg)-255);
     }
   }
-  return output;
+    Canvas = document.getElementById("can");
+  redImage.drawTo(Canvas);
 }
-
-function doGreenScreen() {
-  //check that images are loaded
-  if (fgImage == null  || ! fgImage.complete()) {
-    alert("Foreground image not loaded");
+function rainbow(){
+   if(image==null || !image.complete){
+    alert("Image not Loaded");
+    return;
   }
-  if (bgImage == null || ! bgImage.complete()) {
-    alert("Background image not loaded");
-  }
-  // clear canvases
-  clearCanvas();
-  // call createComposite, which does green screen algorithm and returns a composite image
-  var finalImage = createComposite();
-  finalImage.drawTo(fgCanvas);
+  var w=rbimage.getWidth();
+  for(var pixel of rbimage.values()){
+    var x=pixel.getX();
+    var avg=(pixel.getRed()+pixel.getGreen()+pixel.getBlue())/3;
+    if(x < (w/7)){
+      //RED
+      if(avg < 128){
+        pixel.setRed(2*avg);
+        pixel.setGreen(0);
+        pixel.setBlue(0);
+        
+      }else{
+        pixel.setRed(255);
+        pixel.setGreen(2*avg-255);
+        pixel.setBlue(2*avg-255);
+      }
+    }
+    
+    if((x >w/7)&&(x<2*w/7)){
+      //orange
+      if(avg<128){
+        pixel.setRed(2*avg);
+        pixel.setGreen(0.8*avg);
+        pixel.setBlue(0);
+      }else{
+        pixel.setRed(255);
+        pixel.setGreen(1.2*avg-51);
+        pixel.setBlue(2*avg)-255;
+      }
+    }
+    if((x> 2*w/7)&&(x < 3*w/7)){
+      //yellow
+      if(avg < 128){
+        pixel.setRed(2*avg);
+        pixel.setGreen(2*avg);
+        pixel.setBlue(0);
+      }else{
+        pixel.setRed(255);
+        pixel.setGreen(255);
+        pixel.setBlue(2*avg-255);
+      }
+    }
+    if((x > 3*w/7)&&(x < 4*w/7)){
+      //green
+      if(avg < 128){
+        pixel.setRed(0);
+        pixel.setGreen(2*avg);
+        pixel.setBlue(0);
+      }else{
+        pixel.setRed(2*avg-255);
+        pixel.setGreen(255);
+        pixel.setBlue(2*avg-255);
+      }
+    }
+    if((x > 4*w/7)&&(x < 5*w/7)){
+      //blue
+      if(x < 128){
+        pixel.setRed(0);
+        pixel.setGreen(0);
+        pixel.setBlue(2*avg);
+      }else{
+        pixel.setRed(2*avg-255);
+        pixel.setGreen(2*avg-255);
+        pixel.setBlue(255);
+      }
+    }
+    if((x > 5*w/7)&&(x < 6*w/7)){
+      //indigo
+      if(avg<128){
+        pixel.setRed(0.8*avg-255);
+        pixel.setGreen(0);
+        pixel.setBlue(2*avg);
+      }else{
+        pixel.setRed(1.2*avg-51);
+        pixel.setGreen(2*avg-255);
+        pixel.setBlue(255);
+      }
+    }
+    if(x > 6*w/7){
+       //violet
+       if(avg<128){
+      pixel.setRed(1.6*avg);
+      pixel.setGreen(0);
+      pixel.setBlue(1.6*avg);
+    }else{
+      pixel.setRed(0.4*avg+153);
+      pixel.setGreen(2*avg-255);
+      pixel.setBlue(0.4*avg+153);
+    }
+  }   
 }
-
+  canvas=document.getElementById("can");
+  rbimage.drawTo(canvas);
+}
+function ResetImage(){
+  if(image==null || !image.complete()){
+    alert("Image not Loaded");
+    return;
+  }
+  Canvas=document.getElementById("can");
+  image.drawTo(Canvas);
+}
 function clearCanvas() {
-  doClear(fgCanvas);
-  doClear(bgCanvas);
+  doClear(Canvas);
 }
-
 function doClear(canvas) {
-  var context = canvas.getContext("2d");
-  context.clearRect(0,0,canvas.width,canvas.height);
+  var context = canvas.getContext("2d"); context.clearRect(0,0,canvas.width,canvas.height);
 }
