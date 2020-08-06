@@ -1,14 +1,20 @@
 var image = null;
+var newimage=null;
 var grayImage = null;
 var redImage = null;
 var rbimage=null;
+var gimage=null;
+var bimage=null;
 var Canvas;
 function loadImage() {
   var file = document.getElementById("fgfile");
   image = new SimpleImage(file);
+  newimage = new SimpleImage(file);
   grayImage = new SimpleImage(file);
   redImage = new SimpleImage(file);
   rbimage = new SimpleImage(file);
+  gimage=new SimpleImage(file);
+  bimage=new SimpleImage(file);
   Canvas = document.getElementById("can");
   image.drawTo(Canvas);
 }
@@ -145,6 +151,71 @@ function rainbow(){
 }
   canvas=document.getElementById("can");
   rbimage.drawTo(canvas);
+}
+function contrast(){
+    if(image==null || !image.complete()){
+      alert("Image not Loaded");
+      return;
+    }
+    for(var px of newimage.values()){
+      var avg=    (px.getRed()+px.getGreen()+ px.getBlue())/3;
+    if(avg<128){
+        px.setRed(avg*Math.PI);
+        px.setGreen(250);
+        px.setBlue(150);
+    }
+    else{
+        px.setRed(255);
+        px.setGreen(avg*Math.PI);
+        px.setBlue(avg*Math.PI);
+        
+    }
+}
+     canvas=document.getElementById("can");
+       newimage.drawTo(canvas);
+
+    }
+function doGreen(){
+  if(image==null || !image.complete()){
+    alert("Image not Loaded");
+    return;
+  }
+  for(var px of gimage.values()){
+    var avg=(px.getRed()+px.getGreen()+px.getBlue())/3;
+    if(avg<128){
+      px.setGreen(2*avg);
+      px.setRed(0);
+      px.setBlue(0);
+    }
+    else{
+      px.setGreen(255);
+      px.setRed((2*avg)-255);
+      px.setBlue((2*avg)-255);
+    }
+  }
+  canvas=document.getElementById("can");
+  gimage.drawTo(canvas);
+}
+function doBlue(){
+  if(image==null || !image.complete()){
+    alert("Image not Loaded");
+    return;
+  }
+  for(var px of bimage.values()){
+    var avg=(px.getRed()+px.getGreen()+px.getBlue())/3;
+    if(avg<128){
+      px.setBlue(2*avg);
+      px.setRed(0);
+      px.setGreen(0);
+    }
+    else{
+      px.setBlue(255);
+      px.setRed((2*avg)-255);
+      px.setGreen((2*avg)-255);
+    }
+  }
+  canvas=document.getElementById("can");
+  bimage.drawTo(canvas);
 }
 function ResetImage(){
   if(image==null || !image.complete()){
